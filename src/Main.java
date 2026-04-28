@@ -1,0 +1,162 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        TriageSystem triageSystem = new TriageSystem();
+        Scanner scnr = new Scanner(System.in);
+
+        boolean running = true;
+
+        System.out.println("Initializing ATLAS System... Enter number of treatment rooms...");
+        System.out.print("Enter number of NeuroRooms (Brain Treatment): ");
+        int brain = scnr.nextInt();
+        System.out.print("Enter number of PelvisRooms (Pelvic Treatment): ");
+        int pelvis = scnr.nextInt();
+        System.out.print("Enter number of OrthoRooms (Musculoskeletal Treatment): ");
+        int musc = scnr.nextInt();
+        System.out.print("Enter number of TorsoRooms (Torso Treatment): ");
+        int torso = scnr.nextInt();
+        triageSystem.initializeRooms(brain, pelvis, musc, torso);
+        System.out.println("~~~ ATLAS ROOMS INITIALIZED ~~~");
+        while (running) {
+            System.out.println("\n=== ATLAS: Automated Triage for Labelless Abnormal Signatures ===");
+            System.out.println("1. Generate patients");
+            System.out.println("2. View waiting queue");
+            System.out.println("3. Modify treatment rooms");
+            System.out.println("4. Fill treatment rooms");
+            System.out.println("5. Apply treatment cycle");
+            System.out.println("6. Display room availability");
+            System.out.println("7. Display patients currently in treatment");
+            System.out.println("8. Exit");
+            System.out.print("Enter Selection: ");
+            switch (scnr.nextInt()) {
+                case 1:
+                    generatePatients(scnr, triageSystem);
+                    break;
+                case 2:
+                    triageSystem.printQueue();
+                    break;
+                case 3:
+                    pickRoomType(scnr, triageSystem);
+                    break;
+                case 4:
+                    fillTreatmentRooms(triageSystem);
+                    break;
+                case 5:
+                    triageSystem.applyTreatmentCycle();
+                    break;
+                case 6:
+                    triageSystem.printRoomStatus();
+                    break;
+                case 7:
+                    triageSystem.printInTreatment();
+                    break;
+                case 8:
+                    running = false;
+                    System.out.println("Exiting ATLAS... Have a great day.");
+                    break;
+            }
+        }
+
+    }
+
+    private static void generatePatients(Scanner scnr, TriageSystem triageSystem) {
+        System.out.print("\nEnter number of patients to simulate: ");
+        int count = scnr.nextInt();
+        for (Patient p : PatientGenerator.generatePatients(count)) {
+            triageSystem.addPatient(p);
+        }
+        System.out.println(count + " patients generated.");
+    }
+
+    private static void pickRoomType(Scanner scnr, TriageSystem triageSystem) {
+        boolean modifying = true;
+
+        while (modifying) {
+            System.out.println("\n=== MODIFY TREATMENT ROOMS ===");
+            System.out.println("Choose room type to modify:");
+            System.out.println("1. Brain (NeuroRoom)");
+            System.out.println("2. Pelvic (PelvicRoom)");
+            System.out.println("3. MusculoSkeletal (OrthoRoom)");
+            System.out.println("4. Torso (TraumaRoom)");
+            System.out.println("5. BACK TO MAIN MENU");
+
+            System.out.print("Enter choice: ");
+            int choice = scnr.nextInt();
+            scnr.nextLine(); // flush newline
+
+            switch (choice) {
+                case 1:
+                    modifyRoomType("Brain", scnr, triageSystem);
+                    break;
+                case 2:
+                    modifyRoomType("Pelvis", scnr, triageSystem);
+                    break;
+                case 3:
+                    modifyRoomType("Musculoskeletal", scnr, triageSystem);
+                    break;
+                case 4:
+                    modifyRoomType("Torso", scnr, triageSystem);
+                    break;
+                case 5:
+                    modifying = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice.");
+            }
+        }
+    }
+
+    private static void modifyRoomType(String roomType, Scanner scnr, TriageSystem triageSystem) {
+        System.out.println("\nModifying: " + roomType);
+        System.out.print("Add or remove rooms? (+ / -): ");
+        String op = scnr.nextLine().trim();
+
+        System.out.print("How many rooms? ");
+        int count = scnr.nextInt();
+        scnr.nextLine();
+        if (op.equals("+")) {
+            triageSystem.addRoom(roomType, count);
+            System.out.println("Added " + count + " " + roomType + " treatment rooms. " + triageSystem.getTotalRooms(roomType) + " total " + roomType + " treatment rooms in system.");
+        } else if (op.equals("-")) {
+            triageSystem.removeRoom(roomType, count);
+            System.out.println("Removed " + count + " " + roomType + " treatment rooms. " + triageSystem.getTotalRooms(roomType) + " total " + roomType + " treatment rooms in system.");
+        } else {
+            System.out.println("Invalid operation.");
+        }
+    }
+
+    private static void fillTreatmentRooms(TriageSystem triageSystem) {
+        System.out.println("=== Filling Treatment Rooms... ===");
+
+        Set<String> fullCategories = new HashSet<>();// stores categories that are full
+        List<Patient> buffer = new ArrayList<>();// patients in full categories
+
+        Patient p;
+
+        while ((p = triageSystem.getNext()) != null) {
+            String category = p.getCriticalScanRegion().getBodyRegion(); //get region that requires treatment
+
+            if (!fullCategories.contains(category) && triageSystem.assignToRoom(category)) { //if the fullCategories set doesn't have the region being treated and there is an empty room for the region, continue
+                triageSystem.getCurrentlyInTreatment().add(p); //adds to patient to inTreatment List
+                System.out.println(p.getName() + " assigned to " + category + " treatment room.");
+            } else {
+                // mark category as full if assignment failed
+                if (!fullCategories.contains(category)) {
+                    fullCategories.add(category);
+
+                    int waiting = triageSystem.countPatientsWaitingFor(category);
+                    System.out.println(category + " Treatment Rooms at capacity (" + waiting + " waiting)"); //report capacity and current waiting
+                }
+
+                buffer.add(p); // store for later
+            }
+        }
+
+        // 🔁 Add everyone back (PQ restores priority automatically)
+        for (Patient patient : buffer) {
+            triageSystem.addPatient(patient);
+        }
+    }
+}
