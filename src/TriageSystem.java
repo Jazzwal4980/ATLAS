@@ -46,23 +46,27 @@ public class TriageSystem {
 
         // find random number of abnormal voxels to remove
         Random rand = new Random();
-        int toRemoveCrit = rand.nextInt(critAbnormal.size()) + 1;
-        int toRemoveMid = (int) Math.ceil(Math.pow(rand.nextDouble(), 0.5) * midAbnormal.size()); // higher weightage
-                                                                                                  // making midAbnormal
-                                                                                                  // voxels treated
-                                                                                                  // easier
+
+        //no weightage, more difficult to remove as closer to seed/core of abnormal region
+        int toRemoveCrit = critAbnormal.isEmpty() ? 0 : rand.nextInt(critAbnormal.size()) + 1;
+
+        //higher weightage makes midAbnormal voxels treated easier
+        int toRemoveMid =  midAbnormal.isEmpty() ? 0 : (int) Math.ceil(Math.pow(rand.nextDouble(), 0.5) * midAbnormal.size());
+
         // most critical voxels are removed first in each group
-        for (int i = 0; i < toRemoveCrit; i++) {
-            critAbnormal.removeLast();
+        for (int i = 0; i < toRemoveCrit && !critAbnormal.isEmpty(); i++) {
+            Voxel v = critAbnormal.removeLast();
+            scan.getVoxels().remove(v);
         }
         for (int i = 0; i < toRemoveMid; i++) {
-            midAbnormal.removeLast();
+            Voxel v = midAbnormal.removeLast();
+            scan.getVoxels().remove(v);
         }
         scan.analyze();
-        System.out.println(scan.getPatient().getName() + " had " + toRemoveCrit
+        System.out.println("----" + scan.getPatient().getName() + " had " + toRemoveCrit
                 + " critically abnormal voxels treated and " + toRemoveMid + " moderately abnormal voxels treated.\n"
                 + scan.getCritAbnormalVoxelList().size() + " critically abnormal voxels remaining and "
-                + scan.getMidAbnormalVoxelList().size() + " moderately abnormal voxels remaining.");
+                + scan.getMidAbnormalVoxelList().size() + " moderately abnormal voxels remaining.\n");
     }
 
     public int getTotalRooms(String roomType) {
@@ -93,9 +97,11 @@ public class TriageSystem {
 
         for (Patient p : treated) {
             // determine category or region with malignancy
-            String region = p.getCriticalScanRegion().getBodyRegion();
+            String region = p.getAssignedRoomType();
 
             releaseRoom(region);
+
+            removeFromTreatment(p);
 
             System.out.println(p.getName() + " is fully treated and discharged!");
         }
@@ -142,7 +148,6 @@ public class TriageSystem {
         if (unocc > 0) {
             // consume one unoccupied room
             unoccupiedRooms.put(roomType, unocc - 1);
-
             // increase occupied count for room type
             int occ = occupiedRooms.getOrDefault(roomType, 0);
             occupiedRooms.put(roomType, occ + 1);

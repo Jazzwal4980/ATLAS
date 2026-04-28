@@ -5,6 +5,7 @@ public class Patient implements Comparable<Patient> {
     private String name;
     private int age;
     private String sex;
+    private String assignedRoomType;
     private ArrayList<MedicalScan> scans;
 
     public Patient(String id, String name, int age, String sex) {
@@ -30,6 +31,14 @@ public class Patient implements Comparable<Patient> {
 
     public String getSex() {
         return sex;
+    }
+
+    public void setAssignedRoomType(String type) {
+        this.assignedRoomType = type;
+    }
+
+    public String getAssignedRoomType() {
+        return assignedRoomType;
     }
 
     public ArrayList<MedicalScan> getScans() {

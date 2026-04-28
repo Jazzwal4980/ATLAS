@@ -140,6 +140,7 @@ public class Main {
 
             if (!fullCategories.contains(category) && triageSystem.assignToRoom(category)) { //if the fullCategories set doesn't have the region being treated and there is an empty room for the region, continue
                 triageSystem.getCurrentlyInTreatment().add(p); //adds to patient to inTreatment List
+                p.setAssignedRoomType(category);
                 System.out.println(p.getName() + " assigned to " + category + " treatment room.");
             } else {
                 // mark category as full if assignment failed
@@ -150,11 +151,11 @@ public class Main {
                     System.out.println(category + " Treatment Rooms at capacity (" + waiting + " waiting)"); //report capacity and current waiting
                 }
 
-                buffer.add(p); // store for later
+                buffer.add(p); //store for later
             }
         }
 
-        // 🔁 Add everyone back (PQ restores priority automatically)
+        //Add everyone back (priority queue restores priority automatically)
         for (Patient patient : buffer) {
             triageSystem.addPatient(patient);
         }
