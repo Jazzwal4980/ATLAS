@@ -11,13 +11,13 @@ public class Main {
         System.out.println("Initializing ATLAS System... Enter number of treatment rooms...");
         System.out.print("Enter number of NeuroRooms (Brain Treatment): ");
         int brain = scnr.nextInt();
-        System.out.print("Enter number of PelvisRooms (Pelvic Treatment): ");
-        int pelvis = scnr.nextInt();
+        System.out.print("Enter number of PelvicRoom (Pelvic Treatment): ");
+        int pelvic = scnr.nextInt();
         System.out.print("Enter number of OrthoRooms (Musculoskeletal Treatment): ");
         int musc = scnr.nextInt();
-        System.out.print("Enter number of TorsoRooms (Torso Treatment): ");
+        System.out.print("Enter number of TraumaRooms (Torso Treatment): ");
         int torso = scnr.nextInt();
-        triageSystem.initializeRooms(brain, pelvis, musc, torso);
+        triageSystem.initializeRooms(brain, pelvic, musc, torso);
         System.out.println("~~~ ATLAS ROOMS INITIALIZED ~~~");
         while (running) {
             System.out.println("\n=== ATLAS: Automated Triage for Labelless Abnormal Signatures ===");
@@ -76,10 +76,10 @@ public class Main {
         while (modifying) {
             System.out.println("\n=== MODIFY TREATMENT ROOMS ===");
             System.out.println("Choose room type to modify:");
-            System.out.println("1. Brain (NeuroRoom)");
-            System.out.println("2. Pelvic (PelvicRoom)");
-            System.out.println("3. MusculoSkeletal (OrthoRoom)");
-            System.out.println("4. Torso (TraumaRoom)");
+            System.out.println("1. NeuroRoom (Brain)");
+            System.out.println("2. PelvicRoom (Pelvic)");
+            System.out.println("3. OrthoRoom (Musculoskeletal)");
+            System.out.println("4. TraumaRoom (Torso)");
             System.out.println("5. BACK TO MAIN MENU");
 
             System.out.print("Enter choice: ");
@@ -91,7 +91,7 @@ public class Main {
                     modifyRoomType("Brain", scnr, triageSystem);
                     break;
                 case 2:
-                    modifyRoomType("Pelvis", scnr, triageSystem);
+                    modifyRoomType("Pelvic", scnr, triageSystem);
                     break;
                 case 3:
                     modifyRoomType("Musculoskeletal", scnr, triageSystem);
@@ -158,5 +158,6 @@ public class Main {
         for (Patient patient : buffer) {
             triageSystem.addPatient(patient);
         }
+        triageSystem.printRoomStatus();
     }
 }

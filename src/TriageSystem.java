@@ -44,7 +44,7 @@ public class TriageSystem {
         if (critAbnormal.isEmpty() && midAbnormal.isEmpty())
             return;
 
-        // find ranodom number of abnormal voxels to remove
+        // find random number of abnormal voxels to remove
         Random rand = new Random();
         int toRemoveCrit = rand.nextInt(critAbnormal.size()) + 1;
         int toRemoveMid = (int) Math.ceil(Math.pow(rand.nextDouble(), 0.5) * midAbnormal.size()); // higher weightage
@@ -239,7 +239,7 @@ public class TriageSystem {
             Patient p = tempQueue.poll();
             System.out.println("\n-------" + rank + ". " + p.getName() + " | Total Abnormal Voxels: "
                     + p.getTotalAbnormalVoxels() + " | " + "Critically Abnormal Voxels: " + p.getTotalCritVoxels()
-                    + ", Moderate Abnormal Voxels: " + p.getTotalMidVoxels());
+                    + ", Moderately Abnormal Voxels: " + p.getTotalMidVoxels());
             System.out.println(p.getCriticalFinding());
             rank++;
         }
