@@ -9,14 +9,10 @@ public class Main {
         boolean running = true;
 
         System.out.println("Initializing ATLAS System... Enter number of treatment rooms...");
-        System.out.print("Enter number of NeuroRooms (Brain Treatment): ");
-        int brain = scnr.nextInt();
-        System.out.print("Enter number of PelvicRoom (Pelvic Treatment): ");
-        int pelvic = scnr.nextInt();
-        System.out.print("Enter number of OrthoRooms (Musculoskeletal Treatment): ");
-        int musc = scnr.nextInt();
-        System.out.print("Enter number of TraumaRooms (Torso Treatment): ");
-        int torso = scnr.nextInt();
+        int brain = getValidInt(scnr, "Enter number of NeuroRooms (Brain Treatment): ");
+        int pelvic = getValidInt(scnr, "Enter number of PelvicRoom (Pelvic Treatment): ");
+        int musc = getValidInt(scnr, "Enter number of OrthoRooms (Musculoskeletal Treatment): ");
+        int torso = getValidInt(scnr, "Enter number of TraumaRooms (Torso Treatment): ");
         triageSystem.initializeRooms(brain, pelvic, musc, torso);
         System.out.println("~~~ ATLAS ROOMS INITIALIZED ~~~");
         while (running) {
@@ -29,8 +25,7 @@ public class Main {
             System.out.println("6. Display room availability");
             System.out.println("7. Display patients currently in treatment");
             System.out.println("8. Exit");
-            System.out.print("Enter Selection: ");
-            switch (scnr.nextInt()) {
+            switch (getValidInt(scnr, "Enter Selection: ")) {
                 case 1:
                     generatePatients(scnr, triageSystem);
                     break;
@@ -61,9 +56,26 @@ public class Main {
 
     }
 
+    private static int getValidInt(Scanner scnr, String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                int value = scnr.nextInt();
+                scnr.nextLine();
+                if(value < 0) {
+                    System.out.println("Invalid input. Please enter a valid number.");
+                    continue;
+                }
+                return value;
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
+                scnr.nextLine();
+            }
+        }
+    }
+
     private static void generatePatients(Scanner scnr, TriageSystem triageSystem) {
-        System.out.print("\nEnter number of patients to simulate: ");
-        int count = scnr.nextInt();
+        int count = getValidInt(scnr, "\nEnter number of patients to simulate: ");
         for (Patient p : PatientGenerator.generatePatients(count)) {
             triageSystem.addPatient(p);
         }
@@ -82,8 +94,7 @@ public class Main {
             System.out.println("4. TraumaRoom (Torso)");
             System.out.println("5. BACK TO MAIN MENU");
 
-            System.out.print("Enter choice: ");
-            int choice = scnr.nextInt();
+            int choice = getValidInt(scnr,"Enter Choice:");
             scnr.nextLine(); // flush newline
 
             switch (choice) {
@@ -113,8 +124,7 @@ public class Main {
         System.out.print("Add or remove rooms? (+ / -): ");
         String op = scnr.nextLine().trim();
 
-        System.out.print("How many rooms? ");
-        int count = scnr.nextInt();
+        int count = getValidInt(scnr, "How many rooms? ");
         scnr.nextLine();
         if (op.equals("+")) {
             triageSystem.addRoom(roomType, count);
