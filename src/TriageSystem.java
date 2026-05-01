@@ -242,7 +242,7 @@ public class TriageSystem {
         }
         while (!tempQueue.isEmpty()) {
             Patient p = tempQueue.poll();
-            System.out.println("\n-------" + rank + ". " + p.getName() + " | Total Abnormal Voxels: "
+            System.out.println("\n-------" + rank + ". " + p.getName() + ": " + p.getAge() + " years of age" + "\nTotal Abnormal Voxels: "
                     + p.getTotalAbnormalVoxels() + " | " + "Critically Abnormal Voxels: " + p.getTotalCritVoxels()
                     + ", Moderately Abnormal Voxels: " + p.getTotalMidVoxels());
             System.out.println(p.getCriticalFinding());

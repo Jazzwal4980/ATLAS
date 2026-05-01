@@ -147,9 +147,9 @@ public class Patient implements Comparable<Patient> {
         double abnormalWeight = 1.5; //weight of total number of abnormal voxels
         double ageWeight = 1.0; //weight of age of patient
 
-        double critNorm = getTotalCritVoxels() / 200.0;
+        double critNorm = getTotalCritVoxels() / 150.0; //tuned
         double dangerNorm = getMaxDangerScore() / 10.0;
-        double abnormalNorm = getTotalAbnormalVoxels() / 400.0;
+        double abnormalNorm = getTotalAbnormalVoxels() / 200.0;
         /*
         critNorm = difficult to determine max --> requires clinical trial to find reasonable estimate
         This project uses ~40 per scan, so 160 total
@@ -175,15 +175,19 @@ public class Patient implements Comparable<Patient> {
 
     @Override
     public int compareTo(Patient other) {
-        int cmp = Double.compare(other.getMaxDangerScore(), this.getMaxDangerScore());
+        int cmp = Double.compare(other.getTriageScore(), this.getTriageScore());
         if (cmp != 0) {
-            return cmp; // Higher max danger score first
+            return cmp;
         }
+        // int cmp = Double.compare(other.getMaxDangerScore(), this.getMaxDangerScore());
+        // if (cmp != 0) {
+        //     return cmp; // Higher max danger score first
+        // }
         
-        cmp = Integer.compare(other.getTotalCritVoxels(), this.getTotalCritVoxels());
-        if (cmp != 0) {
-            return cmp; // Based on number of abnormal voxels if max danger scores are equal
-        }
+        // cmp = Integer.compare(other.getTotalCritVoxels(), this.getTotalCritVoxels());
+        // if (cmp != 0) {
+        //     return cmp; // Based on number of abnormal voxels if max danger scores are equal
+        // }
 
         return 0; // Equal priority
     }

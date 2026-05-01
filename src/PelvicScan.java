@@ -36,7 +36,7 @@ public class PelvicScan extends MedicalScan {
 
         return explanation.toString().trim();
     }
-
+    @Override
     public String analyze() {
         //Compute danger scores for all voxels
         for (Voxel voxel : voxels) {
